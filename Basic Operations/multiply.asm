@@ -1,3 +1,4 @@
+/ Multiply calculator
 / Prompt user to type in integers
 INPUT
 Store X
