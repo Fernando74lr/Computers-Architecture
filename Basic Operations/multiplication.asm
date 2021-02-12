@@ -9,10 +9,10 @@ Store Y
 / Loop for performing iterative addition
 loop,  Load num
        Add X
-       Store num
+       Store num / num+=X
        Load Y
        Subt one
-       Store Y
+       Store Y / Y--
        Skipcond 400 / have we completed the multiplication?
        Jump loop / no; repeat loop
        / yes, so exit the loop
