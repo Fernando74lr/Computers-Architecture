@@ -1,4 +1,5 @@
 / Multiply calculator
+/ Reference and Explanation:  https://marie.js.org/book.pdf (Page 20)
 / Prompt user to type in integers
 INPUT
 Store X
