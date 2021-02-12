@@ -1,0 +1,13 @@
+/ Addition Calculator
+
+Input
+Store X
+Input 
+Store Y
+
+Add X
+Output
+Halt
+
+X, DEC 0
+Y, DEC 0
