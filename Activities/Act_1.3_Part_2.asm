@@ -16,7 +16,7 @@ storeData,  Input / Ask for input
             Store TIMES / Store AC in TIMES
             
             Skipcond 400 / Skip if AC is equal to 0
-            Jump storeData / Jump to "add" subroutine
+            Jump storeData / Jump to "storeData" subroutine
 
 add,  Load RES / Load RES in AC
       AddI BASE / Add indirectly value of the address LOC to AC
