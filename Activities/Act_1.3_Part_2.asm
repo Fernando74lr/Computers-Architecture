@@ -18,13 +18,17 @@ storeData,  Input / Ask for input
             Skipcond 400 / Skip if AC is equal to 0
             Jump storeData / Jump to "storeData" subroutine
 
+/ Go back to base HEX 30
+Load BASE
+Store LOC
+
 add,  Load RES / Load RES in AC
-      AddI BASE / Add indirectly value of the address LOC to AC
+      AddI LOC / Add indirectly value of the address LOC to AC
       Store RES / Store AC in RES
       
-      Load BASE / Load BASE in AC
+      Load LOC / Load LOC in AC
       Add ONE / Add ONE to AC
-      Store BASE / Store AC in BASE
+      Store LOC / Store AC in LOC
 
       Load NUM / Load NUM in AC
       Subt ONE / Substract ONE to AC
