@@ -1,5 +1,5 @@
 / Activity 1.3 (part 3): find max and min of all the stored data.
-/ NOT FINISHED
+/ NOT FINISHED YET :)
 storeData,  Input / Ask for input
             StoreI LOC / Store indirectly input value in LOC
 
