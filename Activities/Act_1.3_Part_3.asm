@@ -1,5 +1,5 @@
 / Activity 1.3 (part 3): find max and min of all the stored data.
-/ NOT FINISHED YET :)
+/ Bug: if the list isn't sorted from lower to higher, it fails giving the min.
 storeData,  Input / Ask for input
             StoreI LOC / Store indirectly input value in LOC
 
@@ -29,11 +29,7 @@ add,  Load RES / Load RES in AC
       Load LOC / Load LOC in AC
       Add ONE / Add ONE to AC
       Store LOC / Store AC in LOC
-      
-      Load TIMES / Load TIMES in AC
-      Add ONE / Add ONE to AC
-      Store TIMES / Store AC in TIMES
-            
+
       Load NUM / Load NUM in AC
       Subt ONE / Substract ONE to AC
       Store NUM / Store AC in NUM
@@ -41,89 +37,95 @@ add,  Load RES / Load RES in AC
       Skipcond 400 / Skip if AC is equal to 0
       Jump add / Jump to "add" subroutine
 
-/ Set LOC at the last data
-Load LOC / At this point LOC is in 00C6
+/ Leave BASE 1 POSITION BEHIND THE BEGINNING
+Load BASE
 Subt ONE
-Store LOC / At this point LOC is in 00C5
+Store BASE
 
-maxAndMin,    Load LOC / LOC is in 00C4
-			  Subt ONE / LOC is in 00C3
-              Store LOC
+/ Locate LOC in the last position of the input stored list
+Load LOC
+Subt ONE
+Store LOC
 
-			  LoadI LOC / Load 149
-			  Store SUBST_TMP
-              
-  			  Load LOC
-			  Add ONE / LOC is in 00C4
-              Store LOC
-              
-              LoadI LOC / Load 150 to AC
-			  Subt SUBST_TMP / Substract 149 to 150 = 1
-              Store SUBST_TMP
-              
-              Skipcond 800 / Skip if AC (SUBST_TMP) > 0
-              Skipcond 000 / Skip if AC (SUBST_TMP) < 0
-              Jump firstIf / IF 1
-              Jump secondIf / IF 2
+LoadI LOC
+StoreI BASE
 
-subsLOC,  Load LOC
-		  Subt ONE
-          Store LOC
-          Jump maxAndMin
+Jump max_and_min
 
-firstIf, LoadI LOC / 150
-	     Subt MAX / 150 - 0 = 150
-	     Store TMP / TMP = 150
-      
-	     Load TMP / AC = 150
-	     Skipcond 800 / Skip if AC > 0 ✔
-	     Output
-	     LoadI LOC / AC = 150
-	     Store MAX / MAX = 150
-      
-      	 Load ZERO
-         Store TMP / TMP = 0
-      	
-	     Load TIMES
-	     Subt ONE
-	     Store TIMES
-      
-	     Skipcond 400 / Skip if AC == 0
-	     Jump subsLOC / Return to loop
-	     Jump end / End program
+check_min, Load Z
+		   Skipcond 000 / skip if AC < 0
+           Jump check_end
 
-secondIf, LoadI LOC / 150
-		  Store TMP / TMP = 150
-          Load MIN / AC = 0
-          Subt TMP / 0 - TMP = -150
-          Store TMP / TMP = -150
-      
-	      Load TMP / AC = -150
-	      Skipcond 800 / Skip if AC > 0 ✔
-	      Output
-          
-      
- 	      Load TIMES
-	      Subt ONE
-	      Store TIMES
-      
-	      Skipcond 400 / Skip if AC == 0
-	      Jump subsLOC / Return to loop
-	      Jump end / End program
+           Load ALPHA
+           Subt MIN
+           Store TMP / tmp = alpha - min
+           
+           Skipcond 800 / skip if AC > 0
+           Jump check_end
+           
+           Load ALPHA
+           Store MIN / max = alpha
+           
+           Jump check_end
 
-end, Load RES
-	 Output
-	 Halt
+check_max, Load Z
+		   Skipcond 800 / skip if AC > 0
+           Jump check_min
+           
+           Load ALPHA
+           Subt MAX
+           Store TMP / tmp = alpha - max
+           
+           Skipcond 800 / skip if AC > 0
+           Jump check_end
+           
+           Load ALPHA
+           Store MAX / max = alpha
+           
+           Jump check_end
+
+check_end, Load LOC
+		   Subt BASE
+           Skipcond 400 / skip if AC == 0
+           Jump max_and_min
+           Jump end_program
+
+max_and_min, LoadI LOC
+			 Store ALPHA / alpha = (loc)I
+             
+             Load LOC
+             Subt ONE
+             Store LOC / loc = loc - 1
+             
+             LoadI LOC
+             Store PHI / phi = (loc - 1)I
+             
+             Load ALPHA
+             Subt PHI
+             Store Z / z = alpha - phi
+             
+             Skipcond 400 / skip if AC == 0
+             Jump check_max
+             Jump check_end            
+             
+end_program, Load RES
+			 Output
+             Load MAX
+             Output
+             Load MIN
+             Output
+			 Halt
 
 ONE, DEC 1
 NUM, DEC 0 / In this case, NUM represents the new "TIMES"
-BASE, HEX 30
+BASE, HEX 100
 RES, DEC 0
-LOC, HEX 30 / Location
-TIMES, DEC 3 /150
+LOC, HEX 100 / Location
+TIMES, DEC 150 / 150
 
-ZERO, DEC 0
+Z, DEC 0
 MAX, DEC 0
 MIN, DEC 0
 TMP, DEC 0
-SUBST_TMP, DEC 0
+ALPHA, DEC 0
+PHI, DEC 0
