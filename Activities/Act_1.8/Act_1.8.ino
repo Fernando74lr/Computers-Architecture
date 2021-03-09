@@ -1,10 +1,8 @@
 #include <MaxMatrix.h>
-
 #include <string.h>
 
-#define DEBUG(a, b) for (int index = 0; index < b; index++) Serial.print(a[index]);
-Serial.println();
-
+#define DEBUG(a, b) for (int index = 0; index < b; index++) Serial.print(a[index]); Serial.println();
+//#include <avr/pgmspace.h>
 PROGMEM const byte CH[] = {
 3, 8, B0000000, B0000000, B0000000, B0000000, B0000000, // space 32
 1, 8, B1011111, B0000000, B0000000, B0000000, B0000000, // !
@@ -115,17 +113,17 @@ int i;
 int flagCommand = 0;
 boolean flagControl = false;
 
-boolean flagWrite = false; //write normal
-boolean flagWrite2 = false; //write data
+boolean flagWrite = false;//write normal
+boolean flagWrite2 = false;//write data
 boolean flagFPS = false;
 
 boolean flagBlank = false;
 
-boolean pause = false;
-boolean commandPause = false;
+boolean pause=false;
+boolean commandPause=false;
 
 String newString = "";
-int sizeString = 0;
+int sizeString=0;
 
 boolean asterisco = false;
 
@@ -134,176 +132,186 @@ char cadenaTemp[10];
 
 size_t dataIndex = 0;
 
-void setup() {
+void setup()
+{
   m.init();
   m.setIntensity(8);
   Serial.begin(9600);
 }
 
-void loop() {
-    int j = 0;
-    while (Serial.available()) {
+void loop(){
+    int j=0;
+    while(Serial.available()){
       char character = Serial.read();
-      if (character == '*') {
+      if(character =='*'){
         asterisco = true;
       }
-      if (character != '\n') {
-        if (!asterisco)
-          newString.concat(character);
-      } else {
-
-        if (flagControl) {
-          if (newString == "write!") {
-            //Serial.println(newString);
-            flagCommand = 1;
-          } else if (newString == "data!") {
-            if (flagCommand == 1) {
-              flagWrite = true;
-              flagCommand = 2;
-              //Serial.println(newString+" Write");
-            } else if (flagCommand == 5) {
-              flagFPS = true;
-              flagCommand = 2;
-              //Serial.println(newString+ " Fps");
+      if (character != '\n')
+      {
+         if(!asterisco)
+            newString.concat(character);
+      }
+      else
+      {
+   
+            if(flagControl){
+                if(newString == "write!"){
+                  //Serial.println(newString);
+                  flagCommand = 1;
+                }else if(newString == "data!"){
+                  if(flagCommand==1){
+                    flagWrite = true;
+                    flagCommand = 2;
+                    //Serial.println(newString+" Write");
+                  }else if(flagCommand==5){
+                    flagFPS = true;
+                    flagCommand = 2;
+                    //Serial.println(newString+ " Fps");
+                  }
+                }else if(newString == "blank!"){
+                  flagCommand = 3;
+                  //Serial.println(newString);
+                  flagControl = false;
+                  Serial.println("OK");
+                }else if(newString == "pause!"){
+                  commandPause = true;
+                  //Serial.println(newString);
+                }else if(newString == "fps!"){
+                  flagCommand = 5;
+                  //Serial.println(newString);
+                }else if(newString == "show!"){
+                  flagCommand = 6;
+                  flagWrite2 = true; //Permite que se muestre lo que está en "cadena"
+                  strcpy(cadena, cadenaTemp); 
+                  //cadena = cadenaTemp;
+                  //Serial.println(newString);
+                  Serial.println("OK");
+                }else if(newString == "logo!"){
+                  flagCommand = 7;
+                  //Serial.println(newString);
+                  flagControl = false;
+                  Serial.println("OK");
+                }else if(newString == "true!"){
+                  if(commandPause){
+                    flagCommand = 8;
+                    pause = false;
+                    //Serial.println(newString);
+                    flagControl = false;
+                    Serial.println("OK");
+                  }
+                }else if(newString == "false!"){
+                  if(commandPause){
+                    flagCommand = 9;
+                    pause = true;
+                    //Serial.println(newString);
+                    flagControl = false;
+                    Serial.println("OK");
+                  }
+                }else if(newString=="control!"){
+                  flagControl=true;
+                  //Serial.println(newString);
+                }
+                else{
+                  if(flagWrite){ 
+                    if(asterisco){
+                      sizeString = newString.length();
+                      //newString.toCharArray(cadena, 10);
+                      newString.toCharArray(cadenaTemp,10);
+                      //flagWrite2 = true; //Mostrar
+                      asterisco = false;
+                      Serial.println("OK");
+                    }                 
+                  }
+                  else{
+                    flagWrite2 = false;
+                  }
+                  flagCommand = 10; 
+                  flagControl = false; 
+                }
+                
             }
-          } else if (newString == "blank!") {
-            flagCommand = 3;
-            //Serial.println(newString);
-            flagControl = false;
-            Serial.println("OK");
-          } else if (newString == "pause!") {
-            commandPause = true;
-            //Serial.println(newString);
-          } else if (newString == "fps!") {
-            flagCommand = 5;
-            //Serial.println(newString);
-          } else if (newString == "show!") {
-            flagCommand = 6;
-            flagWrite2 = true; //Permite que se muestre lo que está en "cadena"
-            strcpy(cadena, cadenaTemp);
-            //cadena = cadenaTemp;
-            //Serial.println(newString);
-            Serial.println("OK");
-          } else if (newString == "logo!") {
-            flagCommand = 7;
-            //Serial.println(newString);
-            flagControl = false;
-            Serial.println("OK");
-          } else if (newString == "true!") {
-            if (commandPause) {
-              flagCommand = 8;
-              pause = false;
-              //Serial.println(newString);
-              flagControl = false;
-              Serial.println("OK");
+            if(newString=="control!"){
+                  flagControl=true;
             }
-          } else if (newString == "false!") {
-            if (commandPause) {
-              flagCommand = 9;
-              pause = true;
-              //Serial.println(newString);
-              flagControl = false;
-              Serial.println("OK");
-            }
-          } else if (newString == "control!") {
-            flagControl = true;
-            //Serial.println(newString);
-          } else {
-            if (flagWrite) {
-              if (asterisco) {
-                sizeString = newString.length();
-                //newString.toCharArray(cadena, 10);
-                newString.toCharArray(cadenaTemp, 10);
-                //flagWrite2 = true; //Mostrar
-                asterisco = false;
-                Serial.println("OK");
-              }
-            } else {
-              flagWrite2 = false;
-            }
-            flagCommand = 10;
-            flagControl = false;
-          }
-
-        }
-        if (newString == "control!") {
-          flagControl = true;
-        }
-        newString = "";
+            newString = "";
       }
       j++;
-    }
-    if (!pause) {
-      switch (flagCommand) {
-      case 2: //data
-        //
-        break;
-      case 3: //blank
-        writeMatrix("                              ");
-        flagWrite = false;
-        flagWrite2 = false;
-        break;
-      case 7: //logo
-        writeMatrixLogo();
-        flagWrite = false;
-        flagWrite2 = false;
-        break;
-      default:
-        break;
+  }
+  if(!pause){
+      switch (flagCommand){
+          case 2://data
+           //
+            break;
+          case 3: //blank
+            writeMatrix("                              ");
+            flagWrite = false;
+            flagWrite2 = false;
+            break;
+          case 7: //logo
+            writeMatrixLogo();
+            flagWrite = false;
+            flagWrite2 = false;
+          break;
+          default:
+            break;
 
-        if (flagWrite2) {
-          writeMatrix(cadena);
-        } else if (flagFPS) {
-          //No se hace nada
-        }
-
-      } //fin if(pause)
-    } //fin loop
-
-    void writeMatrix(char newCadena[]) {
-      for (i = 0; i < sizeString; i++) {
-        printCharWithShift(newCadena[i], 100);
+      if(flagWrite2){
+        writeMatrix(cadena);
+      }else if (flagFPS){
+        //No se hace nada
       }
-      delay(100);
-      m.shiftLeft(false, true);
+
+      
+  }//fin if(pause)
+}//fin loop
+
+
+void writeMatrix(char newCadena[]){
+  for (i = 0; i < sizeString; i++){
+    printCharWithShift(newCadena[i], 100);
+  }
+  delay(100);
+  m.shiftLeft(false, true);
+}
+
+void printCharWithShift(char c, int shift_speed)
+{
+  if (c < 32) return;
+  c -= 32;
+  memcpy_P(buffer, CH + 7*c, 7);
+  m.writeSprite(32, 0, buffer);
+  m.setColumn(32 + buffer[0], 0);
+  
+  for (int i=0; i<buffer[0]+1; i++) 
+  {
+    delay(shift_speed);
+    m.shiftLeft(false, false);
+  }
+}
+
+void printStringWithShift(char* s, int shift_speed)
+{
+  while (*s != 0)
+  {
+    printCharWithShift(*s, shift_speed);
+    s++;
+  }
+}
+
+/* LOGO */
+void writeMatrixLogo(){
+  char charLogo[] = "<=         ";
+  //Serial.println(newCadena);
+  for (i = 0; i < 11; i++){
+    if(i==0){
+      printCharWithShift(126, 100);
+    }if(i==1){
+      printCharWithShift(127, 100);
     }
-
-    void printCharWithShift(char c, int shift_speed) {
-      if (c < 32) return;
-      c -= 32;
-      memcpy_P(buffer, CH + 7 * c, 7);
-      m.writeSprite(32, 0, buffer);
-      m.setColumn(32 + buffer[0], 0);
-
-      for (int i = 0; i < buffer[0] + 1; i++) {
-        delay(shift_speed);
-        m.shiftLeft(false, false);
-      }
+    if(i!=0 && i!=1){
+      printCharWithShift(charLogo[i], 100);
     }
-
-    void printStringWithShift(char * s, int shift_speed) {
-      while ( * s != 0) {
-        printCharWithShift( * s, shift_speed);
-        s++;
-      }
-    }
-
-    /* LOGO */
-
-    void writeMatrixLogo() {
-      char charLogo[] = "<=         ";
-      //Serial.println(newCadena);
-      for (i = 0; i < 11; i++) {
-        if (i == 0) {
-          printCharWithShift(126, 100);
-        }
-        if (i == 1) {
-          printCharWithShift(127, 100);
-        }
-        if (i != 0 && i != 1) {
-          printCharWithShift(charLogo[i], 100);
-        }
-      }
-      delay(100);
-      m.shiftLeft(false, true);
-    }
+  }
+  delay(100);
+  m.shiftLeft(false, true);
+}
